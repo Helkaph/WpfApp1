@@ -30,5 +30,8 @@
     <Page Update="LoginWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="StyleDictionary.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 </Project>

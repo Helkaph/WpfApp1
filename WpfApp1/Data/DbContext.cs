@@ -7,9 +7,13 @@ namespace WpfApp1.Data
     {
         public DbSet<User> Users { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            optionsBuilder.UseSqlServer("Server=SEPHIROTH\\SQLEXPRESS;Database=EnterApp;Trusted_Connection=True;TrustServerCertificate=True;User Id=Sephiroth\\Sasha;Password=2206");
+
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

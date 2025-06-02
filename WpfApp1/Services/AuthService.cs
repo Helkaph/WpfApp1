@@ -1,17 +1,24 @@
-﻿using WpfApp1.Services;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using WpfApp1.Models;
 using WpfApp1.Data;
+using System.Diagnostics;
+
 namespace WpfApp1.Services
 {
     public class AuthService
     {
-        private AppDbContext _context = new AppDbContext();
-        
+        private readonly AppDbContext _context;
+
+        public AuthService(AppDbContext context)
+        {
+            _context = context;
+        }
+
         public string Authenticate(string username, string password)
         {
             var user = _context.Users.FirstOrDefault(u => u.UserName == username);
-
             if (user == null)
                 return "Введены неправильные данные. Проверьте соответствие введённых данных";
 
@@ -21,17 +28,7 @@ namespace WpfApp1.Services
                 _context.SaveChanges();
                 return "Вы заблокированы. Обратитесь к администратору";
             }
-
             if (!PasswordService.VerifyPassword(password, user.HashPassword))
-            {
-                user.FailAttempts++;
-                if (user.FailAttempts >= 3)
-                    user.IsBlocked = true;
-                _context.SaveChanges();
-                return "Введены неправильные данные. Проверьте соответствие введённых данных";
-            }
-
-            if (!_context.Users.Any(u => u.UserName == username && PasswordService.VerifyPassword(password, u.HashPassword)))
             {
                 user.FailAttempts++;
                 if (user.FailAttempts >= 3)
@@ -44,7 +41,7 @@ namespace WpfApp1.Services
             user.LastLogin = DateTime.Now;
             _context.SaveChanges();
 
-            return user.IsFirstPassword ? "CHANGE" : user.Role;
+            return user.IsFirstPassword ? "CHANGE" : user.Role.ToString();
         }
 
         public string ChangePassword(string username, string currentPassword, string newPassword, string confirmPassword)
@@ -62,15 +59,30 @@ namespace WpfApp1.Services
             user.HashPassword = PasswordService.HashPassword(newPassword);
             user.IsFirstPassword = false;
             _context.SaveChanges();
-            return "Пароль успешно сохранён";
+            return "Пароль успешно изменён";
         }
+        public string ChangePasswordAsAdmin(string username, string newPassword, string confirmPassword)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserName == username);
+            if (user == null)
+                return "Пользователь не найден";
 
-        public string RegisterUser(string username, string password, string role = "User")
+            if (newPassword != confirmPassword)
+                return "Новый пароль и пароль для подтверждения не совпадают";
+
+            if (!PasswordService.IsValidPassword(newPassword))
+                return "Пароль должен содержать заглавные и строчные буквы, цифры, спецсимволы. \nДлина пароля:  16-32 символа";
+
+            user.HashPassword = PasswordService.HashPassword(newPassword);
+            user.IsFirstPassword = false;
+            _context.SaveChanges();
+            return "Пароль успешно изменён";
+        }
+        public string RegisterUser(string username, string password, int role = 1)
         {
             if (_context.Users.Any(u => u.UserName == username))
                 return "Данный пользователь уже существует";
-
-            if (PasswordService.IsValidPassword(password))
+            if (!PasswordService.IsValidPassword(password))
                 return "Пароль должен содержать заглавные и строчные буквы, цифры, спецсимволы. \nДлина пароля:  16-32 символа";
 
             var user = new User

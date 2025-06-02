@@ -11,12 +11,12 @@ using Newtonsoft.Json;
 namespace WpfApp1
 {
     /// <summary>
-    /// Логика взаимодействия для APIWindow.xaml
+    /// Логика взаимодействия для окна "Валидация данных"
     /// </summary>
     public partial class APIWindow : Window
     {
-        private readonly string _apiUrl = "https://localhost:4444/TransferSimulator.exe/fullName";
-        private string _currentFullName = null;
+        private readonly string _apiUrl = "http://localhost:4444/TransferSimulator/inn";
+        private string _currentInn = null;
         public APIWindow()
         {
             InitializeComponent();
@@ -26,9 +26,9 @@ namespace WpfApp1
         {
             try
             {
-                string fullname = await GetFullNameFromApi();
-                DataTextBlock.Text = fullname;
-                _currentFullName = fullname;
+                string inn = await GetInnFromApi();
+                DataTextBlock.Text = inn;
+                _currentInn = inn;
             }
             catch (Exception ex)
             {
@@ -36,7 +36,7 @@ namespace WpfApp1
             }
         }
 
-        private async Task<string> GetFullNameFromApi()
+        private async Task<string> GetInnFromApi()
         {
             using (HttpClient client = new HttpClient())
             {
@@ -44,30 +44,32 @@ namespace WpfApp1
                 response.EnsureSuccessStatusCode();
 
                 string json = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<FullNameResponse>(json);
+                var result = JsonConvert.DeserializeObject<InnResponse>(json);
 
                 return result?.Value ?? "Неизвестно";
             }
         }
         private void CheckAccuracy_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(_currentFullName))
+            if (string.IsNullOrWhiteSpace(_currentInn))
             {
                 CheckResult.Text = "Данные не загружены";
                 return;
             }
 
-            bool isValid = IsValidFullName(_currentFullName);
+            bool isValid = IsValidInn(_currentInn);
 
-            CheckResult.Text = isValid ? "Получены корректные данные" : "В данных обнаружено недопустимые символы";
+            CheckResult.Text = isValid ? "Получен корректный ИНН" : "Полученные данные не корректны";
             CheckResult.Foreground = isValid ? System.Windows.Media.Brushes.Green : System.Windows.Media.Brushes.Red;
         }
 
-        private bool IsValidFullName(string fullName)
+        private bool IsValidInn(string inn)
         {
-            return Regex.IsMatch(fullName, @"^[\p{L} \-]+$");
+            return !string.IsNullOrWhiteSpace(inn) && Regex.IsMatch(inn.Trim(), @"^\d{10}$");
+
+
         }
-        public class FullNameResponse
+        public class InnResponse
         {
             [JsonProperty("value")]
             public string Value { get; set; }

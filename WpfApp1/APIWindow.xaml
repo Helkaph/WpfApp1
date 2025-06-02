@@ -7,12 +7,15 @@
         mc:Ignorable="d"
         Title="Валидация данных" Height="300" Width="400">
     <Grid>
+        <Grid.Resources>
+            <ResourceDictionary Source="StyleDictionary.xaml" />
+        </Grid.Resources>
         <Grid VerticalAlignment="Top" Height="100">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="Получить данные" Click="GetAPIData_Click" Width="150" Height="30" Margin="5" Style="{StaticResource ButtonDefaultStyle}"/>
+            <Button Grid.Column="0" Content="Получить данные" Click="GetAPIData_Click" Width="150" Height="30" Margin="5" Style="{StaticResource DefaultButtonStyle}"/>
             <TextBlock Grid.Column="1" x:Name="DataTextBlock" Text="" Width="200"  Margin="5" FontFamily="Times New Roman" FontSize="14" VerticalAlignment="Center"/>
         </Grid>
         <Grid Height="100">
@@ -20,8 +23,8 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="Отправить результаты теста" Click="CheckAccuracy_Click" Width="230" Height="30" Margin="5" Style="{StaticResource ButtonDefaultStyle}"/>
-            <TextBlock Grid.Column="1" x:Name="CheckResult" HorizontalAlignment="Left" Text="1423423423423" Margin="5" FontFamily="Times New Roman" FontSize="14" VerticalAlignment="Center"/>
+            <Button Grid.Column="0" Content="Отправить результаты теста" Click="CheckAccuracy_Click" Width="230" Height="30" Margin="5" Style="{StaticResource DefaultButtonStyle}"/>
+            <TextBlock Grid.Column="1" x:Name="CheckResult" HorizontalAlignment="Left" Margin="5" FontFamily="Times New Roman" FontSize="14" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
 </Window>
