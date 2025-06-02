@@ -1,0 +1,11 @@
+int
+varchar
+bit
+datetime
+
+
+create trigger tri_name on
+table_name after insert,delete,update as
+begin
+main code with another table
+end
